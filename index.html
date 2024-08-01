@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Admin Panel for YouTube Video Gallery</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f0f2f5;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            padding: 20px;
+        }
+
+        .admin-panel {
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .admin-panel h2 {
+            margin-top: 0;
+            color: #007bff;
+        }
+
+        .search-bar {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .search-bar input[type="text"] {
+            padding: 10px;
+            width: 100%;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            font-size: 16px;
+        }
+
+        .search-bar button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .search-bar button:hover {
+            background-color: #0056b3;
+        }
+
+        .add-video {
+            margin-bottom: 20px;
+        }
+
+        .add-video h3 {
+            margin-top: 0;
+            color: #007bff;
+        }
+
+        .add-video input {
+            padding: 10px;
+            width: calc(50% - 22px);
+            margin-right: 10px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            font-size: 16px;
+        }
+
+        .add-video button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            background-color: #28a745;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .add-video button:hover {
+            background-color: #218838;
+        }
+
+        .video-gallery {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .video-item {
+            flex: 0 0 auto;
+            width: 320px;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #ffffff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        .video-item iframe {
+            width: 100%;
+            height: 180px;
+            border: none;
+        }
+
+        .video-item p {
+            margin: 10px;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .remove-btn, .edit-btn {
+            position: absolute;
+            top: 10px;
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+            padding: 5px;
+        }
+
+        .remove-btn {
+            right: 10px;
+        }
+
+        .edit-btn {
+            right: 50px;
+        }
+
+        .load-more {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+
+        .load-more:hover {
+            background-color: #0056b3;
+        }
+
+        .edit-form, .gallery-view {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .edit-form {
+            display: flex;
+            flex-direction: column;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            width: 300px;
+        }
+
+        .edit-form h3 {
+            margin-top: 0;
+            color: #007bff;
+        }
+
+        .edit-form input {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            font-size: 16px;
+        }
+
+        .edit-form button {
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            background-color: #28a745;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .edit-form button:hover {
+            background-color: #218838;
+        }
+
+        .gallery-view {
+            display: flex;
+            flex-direction: column;
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            width: 80%;
+            height: 80%;
+            overflow-y: auto;
+        }
+
+        .gallery-view .close-btn {
+            align-self: flex-end;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            background-color: #dc3545;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .gallery-view .close-btn:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="admin-panel">
+            <h2>Admin Panel</h2>
+            <div class="search-bar">
+                <input type="text" id="searchBar" placeholder="Search videos..." oninput="filterVideos()">
+                <button onclick="redirectToGallery()">Watch Gallery</button>
+            </div>
+            <div class="add-video">
+                <h3>Add New Video</h3>
+                <input type="text" id="videoUrl" placeholder="Enter YouTube Video URL">
+                <input type="text" id="videoTitle" placeholder="Enter Video Title">
+                <button onclick="addVideo()">Add Video</button>
+            </div>
+        </div>
+
+        <div class="video-gallery" id="videoGallery">
+            <!-- Videos will be dynamically added here -->
+        </div>
+        <button class="load-more" onclick="loadMoreVideos()">Load More</button>
+    </div>
+
+    <div class="edit-form" id="editForm">
+        <h3>Edit Video</h3>
+        <input type="text" id="editTitle" placeholder="New Video Title">
+        <button onclick="saveEdit()">Save</button>
+    </div>
+
+    <div class="gallery-view" id="galleryView">
+        <button class="close-btn" onclick="toggleGalleryView()">Close Gallery</button>
+        <div id="galleryViewContent">
+            <!-- Gallery content to be populated -->
+        </div>
+    </div>
+
+    <script>
+        let videos = JSON.parse(localStorage.getItem('videos')) || [];
+        let currentEditId = null;
+
+        function redirectToGallery() {
+            localStorage.setItem('videos', JSON.stringify(videos));
+            window.location.href = 'gallery.html';
+        }
+
+        function extractVideoId(url) {
+            const patterns = [
+                /youtube\.com\/watch\?v=([a-zA-Z0-9_-]{11})/,
+                /youtube\.com\/embed\/([a-zA-Z0-9_-]{11})/,
+                /youtu\.be\/([a-zA-Z0-9_-]{11})/
+            ];
+            for (const pattern of patterns) {
+                const match = url.match(pattern);
+                if (match) {
+                    return match[1];
+                }
+            }
+            return null;
+        }
+
+        function addVideo() {
+            const url = document.getElementById('videoUrl').value;
+            const title = document.getElementById('videoTitle').value;
+            const videoId = extractVideoId(url);
+
+            if (videoId) {
+                videos.push({ id: videoId, title });
+                localStorage.setItem('videos', JSON.stringify(videos));
+                renderVideos();
+                document.getElementById('videoUrl').value = '';
+                document.getElementById('videoTitle').value = '';
+            } else {
+                alert('Invalid YouTube URL');
+            }
+        }
+
+        function renderVideos() {
+            const videoGallery = document.getElementById('videoGallery');
+            const galleryViewContent = document.getElementById('galleryViewContent');
+            videoGallery.innerHTML = '';
+            galleryViewContent.innerHTML = '';
+
+            videos.forEach(video => {
+                const videoItem = document.createElement('div');
+                videoItem.className = 'video-item';
+                videoItem.dataset.id = video.id;
+
+                const iframe = document.createElement('iframe');
+                iframe.src = `https://www.youtube.com/embed/${video.id}`;
+                iframe.allowFullscreen = true;
+
+                const videoTitle = document.createElement('p');
+                videoTitle.textContent = video.title;
+
+                const removeBtn = document.createElement('button');
+                removeBtn.className = 'remove-btn';
+                removeBtn.textContent = '×';
+                removeBtn.onclick = () => removeVideo(video.id);
+
+                const editBtn = document.createElement('button');
+                editBtn.className = 'edit-btn';
+                editBtn.textContent = '✎';
+                editBtn.onclick = () => openEditForm(video.id);
+
+                videoItem.appendChild(iframe);
+                videoItem.appendChild(videoTitle);
+                videoItem.appendChild(removeBtn);
+                videoItem.appendChild(editBtn);
+
+                videoGallery.appendChild(videoItem);
+                galleryViewContent.appendChild(videoItem.cloneNode(true));
+            });
+        }
+
+        function removeVideo(videoId) {
+            videos = videos.filter(video => video.id !== videoId);
+            localStorage.setItem('videos', JSON.stringify(videos));
+            renderVideos();
+        }
+
+        function openEditForm(videoId) {
+            currentEditId = videoId;
+            const video = videos.find(v => v.id === videoId);
+            document.getElementById('editTitle').value = video.title;
+            document.getElementById('editForm').style.display = 'flex';
+        }
+
+        function saveEdit() {
+            const newTitle = document.getElementById('editTitle').value;
+            const video = videos.find(v => v.id === currentEditId);
+            if (video) {
+                video.title = newTitle;
+                localStorage.setItem('videos', JSON.stringify(videos));
+                renderVideos();
+            }
+            document.getElementById('editForm').style.display = 'none';
+        }
+
+        function filterVideos() {
+            const searchText = document.getElementById('searchBar').value.toLowerCase();
+            const videoItems = document.querySelectorAll('.video-item');
+            videoItems.forEach(item => {
+                const title = item.querySelector('p').textContent.toLowerCase();
+                item.style.display = title.includes(searchText) ? '' : 'none';
+            });
+        }
+
+        function loadMoreVideos() {
+            alert('Load more functionality is not implemented in this demo.');
+        }
+
+        function toggleGalleryView() {
+            const galleryView = document.getElementById('galleryView');
+            galleryView.style.display = galleryView.style.display === 'none' || galleryView.style.display === '' ? 'flex' : 'none';
+        }
+
+        renderVideos();
+    </script>
+</body>
+</html>
