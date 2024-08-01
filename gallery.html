@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YouTube Video Gallery</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f0f2f5;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            padding: 20px;
+        }
+
+        .video-gallery {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .video-item {
+            flex: 0 0 auto;
+            width: 320px;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #ffffff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .video-item iframe {
+            width: 100%;
+            height: 180px;
+            border: none;
+        }
+
+        .video-item p {
+            margin: 10px;
+            font-size: 16px;
+            color: #333;
+        }
+
+        @media (max-width: 768px) {
+            .video-item {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="video-gallery" id="videoGallery">
+            <!-- Videos will be dynamically added here -->
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const videoGallery = document.getElementById('videoGallery');
+            const videos = JSON.parse(localStorage.getItem('videos')) || [];
+
+            videos.forEach(video => {
+                const videoItem = document.createElement('div');
+                videoItem.className = 'video-item';
+
+                const iframe = document.createElement('iframe');
+                iframe.src = `https://www.youtube.com/embed/${video.id}`;
+                iframe.allowFullscreen = true;
+
+                const videoTitle = document.createElement('p');
+                videoTitle.textContent = video.title;
+
+                videoItem.appendChild(iframe);
+                videoItem.appendChild(videoTitle);
+
+                videoGallery.appendChild(videoItem);
+            });
+        });
+    </script>
+</body>
+</html>
